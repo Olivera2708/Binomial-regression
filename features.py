@@ -5,7 +5,8 @@ def get_features(articles):
     nlp = spacy.load("en_core_web_sm")
     features = {
         "word_count": [],
-        "char_count": []
+        "char_count": [],
+        'sentence_count': []
     }
     
     for article in articles:
@@ -13,8 +14,10 @@ def get_features(articles):
 
         word_count = len(doc)
         char_count = len(article)
+        sentence_count = len(list(doc.sents))
 
         features["word_count"].append(word_count)
         features["char_count"].append(char_count)
+        features["sentence_count"].append(sentence_count)
 
     return pd.DataFrame(features)
