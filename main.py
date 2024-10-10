@@ -3,9 +3,11 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, roc_curve, auc
 import pandas as pd
 from features import get_features_basic, get_features_text_ent
-from imblearn.over_sampling import SMOTETomek
+from imblearn.combine import SMOTETomek
+from sklearn.preprocessing import StandardScaler
 from imblearn.under_sampling import RandomUnderSampler
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 def draw_diagram(fpr, tpr, auc):
@@ -22,16 +24,29 @@ def draw_diagram(fpr, tpr, auc):
     plt.grid()
     plt.show()
 
+def drop_highly_correlated_features(data, threshold=0.8):
+    corr_matrix = data.corr().abs()
+    upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
+    to_drop = [column for column in upper.columns if any(upper[column] > threshold)]
+    reduced_data = data.drop(columns=to_drop)
+    return reduced_data
+
+def get_X_y(articles, y):
+    X = get_features_basic(articles)
+    data = pd.concat([X, pd.DataFrame(y)], axis=1)
+    cleaned_data = data.dropna()
+    X = pd.DataFrame(cleaned_data.iloc[:, :-1])
+    y = cleaned_data.iloc[:, -1]
+    X = drop_highly_correlated_features(X)
+    scaler = StandardScaler()
+    return scaler.fit_transform(X), y
 
 def load_data1000():
     data = pd.read_csv('small_equal.csv')
     articles = data['article']
     y = [0 if category == "FactContext" else 1 for category in data['simple_user_need']]
-    X = get_features_text_ent(articles)
-    data = pd.concat([X, pd.DataFrame(y)], axis=1)
-    cleaned_data = data.dropna()
-    X = pd.DataFrame(cleaned_data.iloc[:, 60:-1])
-    y = cleaned_data.iloc[:, -1]
+    X, y = get_X_y(articles, y) 
+
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, shuffle=True)
     return X, y, X_train, X_test, y_train, y_test
 
@@ -39,7 +54,8 @@ def load_given_data():
     data = pd.read_csv('data.csv')
     articles = data['article']
     y = [0 if category == "FactContext" else 1 for category in data['simple_user_need']]
-    X = get_features_text_ent(articles)
+    X, y = get_X_y(articles, y) 
+    
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, shuffle=True)
     return X, y, X_train, X_test, y_train, y_test
 
@@ -47,7 +63,7 @@ def load_oversampling():
     data = pd.read_csv('data.csv')
     articles = data['article']
     y = [0 if category == "FactContext" else 1 for category in data['simple_user_need']]
-    X = get_features_text_ent(articles)
+    X, y = get_X_y(articles, y) 
     smote = SMOTETomek() #preporuka
     X, y = smote.fit_resample(X, y)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, shuffle=True)
@@ -57,7 +73,7 @@ def load_undersampling():
     data = pd.read_csv('data.csv')
     articles = data['article']
     y = [0 if category == "FactContext" else 1 for category in data['simple_user_need']]
-    X = get_features_text_ent(articles)
+    X, y = get_X_y(articles, y) 
     undersampler = RandomUnderSampler()
     X, y = undersampler.fit_resample(X, y)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, shuffle=True)
@@ -66,9 +82,6 @@ def load_undersampling():
 
 if __name__ == "__main__":
     X, y, X_train, X_test, y_train, y_test = load_data1000()
-
-    #Big difference in classes
-    # print(data['simple_user_need'].value_counts())
 
     model = LogisticRegression(max_iter=1000)
     kfold = KFold(n_splits=5, shuffle=True)
