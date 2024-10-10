@@ -64,7 +64,7 @@ def load_oversampling():
     articles = data['article']
     y = [0 if category == "FactContext" else 1 for category in data['simple_user_need']]
     X, y = get_X_y(articles, y) 
-    smote = SMOTETomek() #preporuka
+    smote = SMOTETomek()
     X, y = smote.fit_resample(X, y)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, shuffle=True)
     return X, y, X_train, X_test, y_train, y_test
