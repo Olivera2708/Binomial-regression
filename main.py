@@ -32,11 +32,10 @@ def drop_highly_correlated_features(data, threshold=0.8):
     return reduced_data
 
 def get_X_y(articles, y):
-    X = get_features_basic(articles)
-    data = pd.concat([X, pd.DataFrame(y)], axis=1)
-    cleaned_data = data.dropna()
-    X = pd.DataFrame(cleaned_data.iloc[:, :-1])
-    y = cleaned_data.iloc[:, -1]
+    X = get_features_text_ent(articles, y)
+    cleaned_data = X.fillna(0)
+    X = pd.DataFrame(cleaned_data.drop(columns=["results"]))
+    y = cleaned_data["results"]
     X = drop_highly_correlated_features(X)
     scaler = StandardScaler()
     return scaler.fit_transform(X), y
