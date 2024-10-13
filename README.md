@@ -40,7 +40,7 @@ The model was evaluated using the following metrics:
 - Experimental adjustments using underfitting techniques resulted in a slight drop in accuracy to 72%.
 
 <div align="center">
-  <img src="results.png" alt="Preview">
+  <img src="results.png" alt="Preview" width="400">
 </div>
 
 ## Conclusion
