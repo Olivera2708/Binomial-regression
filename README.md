@@ -37,7 +37,7 @@ The model was evaluated using the following metrics:
 ## Results
 - **Final Accuracy**: 73%
 - **AUC**: 0.8
-- Experimental adjustments using underfitting techniques resulted in a slight drop in accuracy to 72%.
+- Experimental adjustments using undersampling techniques resulted in a slight drop in accuracy to 72%.
 
 <div align="center">
   <img src="results.png" alt="Preview" width="400">
