@@ -39,5 +39,9 @@ The model was evaluated using the following metrics:
 - **AUC**: 0.8
 - Experimental adjustments using underfitting techniques resulted in a slight drop in accuracy to 72%.
 
+<div align="center">
+  <img src="results.png" alt="Preview">
+</div>
+
 ## Conclusion
 The binomial logistic regression model proved to be an effective choice for binary classification of news articles. Techniques for balancing classes significantly improved model performance. The ROC curve for the best model confirms its effectiveness in distinguishing between the two classes.
